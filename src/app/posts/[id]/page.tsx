@@ -1,31 +1,28 @@
-'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import Chip from '@mui/joy/Chip';
-import IconButton from '@mui/joy/IconButton';
-import CircularProgress from '@mui/joy/CircularProgress';
-import { MdFavoriteBorder, MdFavorite } from 'react-icons/md';
+import LikesCounter from '@/components/LikesCounter';
 
-export default function PostPage({ params }: { params: { id: string } }) {
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLiked, setIsLiked] = useState(false);
+async function getPost(id: string) {
+  const res = await fetch(`https://dummyjson.com/posts/${id}`);
 
-  const toggleLike = () => setIsLiked((c) => !c);
+  if (!res.ok) {
+    throw new Error('Failed to fetch post');
+  }
 
-  useEffect(() => {
-    fetch(`https://dummyjson.com/posts/${params.id}`)
-      .then((response) => response.json())
-      .then((data) => setPost(data));
-  }, [params.id]);
+  const post = (await res.json()) as Post;
 
-  if (!post)
-    return (
-      <main className='flex h-screen items-center justify-center'>
-        <CircularProgress />
-      </main>
-    );
+  return post;
+}
 
-  const likesCount = (isLiked ? 1 : 0) + post.reactions;
+export default async function PostPage({ params }: { params: { id: string } }) {
+  const post = await getPost(params.id);
+
+  // if (!post)
+  //   return (
+  //     <main className='flex h-screen items-center justify-center'>
+  //       <CircularProgress />
+  //     </main>
+  //   );
 
   return (
     <main className='flex justify-center px-8'>
@@ -51,24 +48,11 @@ export default function PostPage({ params }: { params: { id: string } }) {
               </Chip>
             ))}
           </div>
-          <div className='flex items-center gap-4'>
-            <IconButton
-              onClick={() => toggleLike()}
-              aria-label='Like the post'
-              sx={{
-                '--IconButton-size': '50px',
-              }}
-            >
-              {isLiked ? <MdFavorite /> : <MdFavoriteBorder />}
-            </IconButton>
-            <p className='font-semibold'>
-              {likesCount} {`Like${likesCount > 1 ? 's' : ''}`}
-            </p>
-          </div>
+          <LikesCounter reactions={post.reactions} />
         </div>
         <div className='flex justify-center'>
           <Link
-            className='mt-16 block w-fit rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white'
+            className='mt-20 block w-fit rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white'
             href='/posts'
           >
             Back to posts
