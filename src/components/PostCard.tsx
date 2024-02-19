@@ -28,7 +28,7 @@ export default function PostCard({
             <h3 className='pb-4 text-center text-xl font-semibold'>
               {post.title}
             </h3>
-            <p className='max-h-20 overflow-hidden text-ellipsis text-nowrap pb-8 text-justify'>
+            <p className='overflow-hidden text-ellipsis whitespace-nowrap pb-8'>
               {post.body}
             </p>
             <div className='flex gap-2'>
@@ -46,7 +46,7 @@ export default function PostCard({
         </Card>
       </Link>
       <IconButton
-        className='absolute bottom-4 left-4'
+        className='!absolute !bottom-4 !left-4'
         variant='soft'
         onClick={() => deletePost(post.id)}
       >
